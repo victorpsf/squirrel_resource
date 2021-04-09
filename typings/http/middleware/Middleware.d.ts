@@ -9,7 +9,7 @@ declare class Middleware {
   router(): void
   get(): Middleware
   listen(): Application
-  build(): Middleware
+  static build(): Middleware
 }
 
 export = Middleware
