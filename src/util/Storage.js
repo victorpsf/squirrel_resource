@@ -139,7 +139,7 @@ module.exports = class Storage extends Path {
   }
 
   /**
-   * @param {path,filename,encodin,parser} param0 
+   * @param {path,filename,encodin,parser} object 
    * 
    * leitura de arquivo
    * 
@@ -184,6 +184,10 @@ module.exports = class Storage extends Path {
     return require(path)
   }
 
+  /**
+   * @param  {path, type} args 
+   * @returns 
+   */
   static disk(...args) {
     let storage = new this
     return storage.disk.apply(storage, args)
@@ -202,10 +206,10 @@ module.exports = class Storage extends Path {
           return storage.path_exists(path)
         },
         save: function ({ filename, value, encoding, parser }) {
-
+          return storage.save_file({ path: _path_, filename, value, encoding, parser })
         },
         find: function ({ filename, encoding, parser }) {
-
+          return storage.read_file({ path: _path_, filename, encoding, parser })
         },
         list: function (path) {
           return storage.list_dir(path)
@@ -229,10 +233,12 @@ module.exports = class Storage extends Path {
    * load
    */
   load() {
+    let loaded = false
     for(let dir of this._directorys.dir) {
       let exists = this.is_dir(this.get(dir))
 
       if (exists.status) continue
+      loaded = true
       this.mkdir(exists.path)
     }
 
@@ -243,8 +249,10 @@ module.exports = class Storage extends Path {
         this.join_path(fullPath, file.name)
       )
       if (exists.status) continue
-
+      loaded = true
       this.save_file({ path: fullPath, filename: file.name, value: file.content })
     }
+
+    if (loaded) this._process.exit()
   }
 }

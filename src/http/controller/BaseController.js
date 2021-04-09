@@ -44,4 +44,8 @@ module.exports = class BaseController {
     this.response.json(params);
     this.response.end();
   }
+
+  static instance(request, response) {
+    return new this(request, response)
+  }
 }

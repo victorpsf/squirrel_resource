@@ -4,9 +4,20 @@ module.exports = class Middleware {
 
   constructor() {}
 
-  router() {}
+  router(router) {
+    this._app.use(router.build())
+  }
+
   pages() {}
-  get() {}
+
+  get() {
+    return this
+  }
+
+  listen(options, callback) {
+    this._app.listen(options, callback)
+    return this._app
+  }
 
   static build() {
     let middleware = new this();

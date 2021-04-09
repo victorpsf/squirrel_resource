@@ -2,6 +2,7 @@ module.exports = class Path {
   _process    = require('process');
   _path       = require('path');
   _directorys = require('./directorys')
+  _publicDirectorys = ['public']
   _paths     = {
     dir: '',
     path: '/',
