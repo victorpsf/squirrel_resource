@@ -2,7 +2,7 @@ const { Router, static } = require('express')
 const Storage = require('../util/Storage')
 const { Util } = require('squirrel_orm')
 
-module.exports = function () {
+const RouterApi = function () {
   return {
     _prefix_: null,
     _router_: Router(),
@@ -17,7 +17,7 @@ module.exports = function () {
       if (this._util_.isNullOrUndefined(this._prefix_)) return
       let { url, callback } = this._prefix_
 
-      let router = callback()
+      let router = callback(RouterApi())
       if (router && this._util_.isFunction(router.build)) this._router_.use(url, router.build())
     },
     _getController(controller) {
@@ -133,3 +133,5 @@ module.exports = function () {
     }
   }
 }
+
+module.exports = RouterApi

@@ -19,7 +19,7 @@ declare interface RouterApi {
   use(args: any[]): RouterApi
   responseHeader(headers?: object): RouterApi
   static(url: string, args: { dir?: string, path: string }): RouterApi
-  prefix(prefix: string, callback: () => RouterApi): RouterApi
+  prefix(prefix: string, callback: (routerApi: RouterApi) => RouterApi): RouterApi
   get(url: string, controller: string, method: string): RouterApi
   get(url: string, controller: (req: Request, res: Response) => void): RouterApi
   put(url: string, controller: string, method: string): RouterApi
