@@ -4,9 +4,7 @@ import Storage from '../util/Storage'
 import httpMethod from '../types/http_method'
 import BaseController from '../http/controller/base_controller'
 
-declare namespace RouterApi {}
-
-declare class RouterApi {
+declare interface RouterApi {
   _prefix_?: { url: string, callback: () => any }
   _router_: typeof Router
   _util_: typeof Util
@@ -35,4 +33,8 @@ declare class RouterApi {
   build(): Router
 }
 
-export = RouterApi
+declare function routerApi(): RouterApi
+
+declare namespace routerApi {}
+
+export = routerApi

@@ -1,4 +1,5 @@
 import { Application, Express } from 'express'
+import Router from '../router'
 
 declare namespace Middleware {}
 
@@ -6,7 +7,7 @@ declare class Middleware {
   _express: Express
   _app: Application
 
-  router(): void
+  router(arg: typeof Router): void
   get(): Middleware
   listen(): Application
   static build(): Middleware
