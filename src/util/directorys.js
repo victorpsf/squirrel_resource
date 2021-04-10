@@ -5,17 +5,17 @@ module.exports = {
     { name: "BaseModel.js", mount: true, dir: "model", content: "const { Model } = require('squirrel_orm')\nconst { Config } = require('squirrel_resource')\n\nmodule.exports = class BaseModel extends Model {\n  constructor() {\n    super(Config.mysql())\n  }\n}" },
     // alterar quando terminar
     // squirrel_resource
-    { name: "index.js", mount: true, dir: "api", content: "const { Router } = require('../../module/index')\n\nmodule.exports = Router()" },
+    { name: "index.js", mount: true, dir: "api", content: "const { Router } = require('squirrel_resource')\n\nmodule.exports = Router()" },
     { name: "make.js", mount: true, dir: "root", content: "const { Make } = require('../module/index')\n\nMake.build()" },
     { module: 'controller', name: "[NAME]Controller.js", mount: false, dir: "controller", content: {
-        original: "const { BaseController } = require('../../../module/index')\n\nmodule.exports = class [NAME]Controller extends BaseController {\n  constructor(request, response) { super(request, response) }\n\n\n\n}",
+        original: "const { BaseController } = require('squirrel_resource')\n\nmodule.exports = class [NAME]Controller extends BaseController {\n  constructor(request, response) { super(request, response) }\n\n\n\n}",
         extended: "const [NAME]Service = require('../service/[NAME]Service.js')\n\nmodule.exports = class [NAME]Controller extends [NAME]Service {\n  constructor(request, response) { super(request, response) }\n\n\n\n}"
       } 
     },
-    { module: 'service', name: "[NAME]Service.js", mount: false, dir: "service", content: "const { BaseController } = require('../../../module/index')\n\nmodule.exports = class [NAME]Service extends BaseController {\n  constructor(request, response) { super(request, response) }\n\n\n\n}" },
+    { module: 'service', name: "[NAME]Service.js", mount: false, dir: "service", content: "const { BaseController } = require('squirrel_resource')\n\nmodule.exports = class [NAME]Service extends BaseController {\n  constructor(request, response) { super(request, response) }\n\n\n\n}" },
     { module: 'router', name: "[NAME]Router.js", mount: false, dir: "api", content: {
-        original: "const { Router } = require('../../module/index')\n\n[NAMECONTROLLER]\n[NAMESERVICE]\n\n\nmodule.exports = Router()",
-        extended: "const { Router } = require('../../module/index')\n\nmodule.exports = Router()"
+        original: "const { Router } = require('squirrel_resource')\n\n[NAMECONTROLLER]\n[NAMESERVICE]\n\n\nmodule.exports = Router()",
+        extended: "const { Router } = require('squirrel_resource')\n\nmodule.exports = Router()"
       } 
     },
     { module: 'model', name: "[NAME]Model.js", mount: false, dir: "model", content: "const BaseModel = require('./BaseModel.js')\n\nmodule.exports = class [NAME]Model extends BaseModel {\n  // define table\n  table = ''\n  fields = {\n    id: {\n      type: this.DataTypes.INTERGER,\n      auto_increment: true,\n      nullable: true,\n      primary_key: true\n    }\n  }\n\n  constructor() { super() }\n  cast = {}\n\n  relation = {}\n\n\n}" },
