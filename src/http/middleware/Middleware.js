@@ -6,11 +6,10 @@ module.exports = class Middleware {
 
   router(router) {
     this._app.use(router.build())
+    return this
   }
 
-  pages() {}
-
-  get() {
+  pages() {
     return this
   }
 
@@ -21,6 +20,6 @@ module.exports = class Middleware {
 
   static build() {
     let middleware = new this();
-    return middleware.get();
+    return middleware
   }
 }

@@ -14,9 +14,11 @@ module.exports = class Path {
     model: '/app',
     pages: '/pages',
     api: '/api',
-    make: '/make',
-    ssl: '/ssl'
+    server_ssl: '/server_ssl',
+    mysql_ssl: '/mysql_ssl',
+    middleware: "/middleware"
   }
+  _args = []
 
   constructor() {
     this.set()
@@ -45,7 +47,11 @@ module.exports = class Path {
   mapArgsExecPath(value, index, array) {
     let info = this.path_info(value)
 
-    if (info.base == 'index.js') return info.dir;
+    if (
+      info.base == 'index.js' || 
+      info.base == 'make.js' ||
+      info.base == 'make'
+    ) return info.dir;
     return '';
   }
 
@@ -55,15 +61,23 @@ module.exports = class Path {
    * recomendação que esteja na base do projeto
    */
   exec_dir(args = []) {
-    let path = args.map((...args) => this.mapArgsExecPath.apply(this, args)).join('');
-    return path;
+    let [bin, path, ...argument] = args
+    this._args = argument
+    return [bin, path].map((...args) => this.mapArgsExecPath.apply(this, args)).join('');
   }
 
   /**
    * adiciona path raiz
    */
   set() {
-    this._paths.dir = this.exec_dir(this._process.argv)
+    let path = this.exec_dir(this._process.argv)
+
+    if (!path) {
+      console.log('Sorry not possible read main path')
+      this._process.exit(1)
+    }
+
+    this._paths.dir = path
   }
 
   /**
@@ -91,17 +105,18 @@ module.exports = class Path {
     switch (path) {
       case 'controller':
       case 'service':
+      case 'middleware':
         return this.join_path(this.get('http'), this._paths[path])
       case 'http':
       case 'private':
       case 'public':
       case 'model':
       case 'api':
-      case 'make':
         return this.join_path(root, this._paths[path])
       case 'pages':
         return this.join_path(this.get('model'), this._paths[path])
-      case 'ssl':
+      case 'server_ssl':
+      case 'mysql_ssl':
         return this.join_path(this.get('private'), this._paths[path])
       case 'root':
       default:

@@ -7,8 +7,7 @@ declare class Middleware {
   _express: Express
   _app: Application
 
-  router(arg: typeof Router): void
-  get(): Middleware
+  router(arg: typeof Router): Middleware
   listen(): Application
   static build(): Middleware
 }

@@ -1,4 +1,5 @@
 const Path = require('./Path')
+const { Util } = require('squirrel_orm')
 
 module.exports = class Storage extends Path {
   _fs = require('fs')
@@ -233,6 +234,7 @@ module.exports = class Storage extends Path {
    * load
    */
   load() {
+    let util = new Util()
     let loaded = false
     for(let dir of this._directorys.dir) {
       let exists = this.is_dir(this.get(dir))
@@ -249,8 +251,10 @@ module.exports = class Storage extends Path {
         this.join_path(fullPath, file.name)
       )
       if (exists.status) continue
-      loaded = true
-      this.save_file({ path: fullPath, filename: file.name, value: file.content })
+      if (file.mount) {
+        loaded = true
+        this.save_file({ path: fullPath, filename: file.name, value: file.content })
+      }
     }
 
     if (loaded) this._process.exit()

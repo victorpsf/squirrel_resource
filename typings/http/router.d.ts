@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express'
+import { Router, Request, Response, NextFunction } from 'express'
 import { Util } from 'squirrel_orm'
 import Storage from '../util/Storage'
 import httpMethod from '../types/http_method'
@@ -31,6 +31,8 @@ declare interface RouterApi {
   options(url: string, controller: string, method: string): RouterApi
   options(url: string, controller: (req: Request, res: Response) => void): RouterApi
   build(): Router
+  middleware(url: string, arg: (req: Request, res: Response, n: NextFunction) => void): RouterApi
+  middleware(url: string, arg: string): RouterApi
 }
 
 declare function routerApi(): RouterApi
