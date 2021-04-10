@@ -6,7 +6,7 @@ module.exports = {
     // alterar quando terminar
     // squirrel_resource
     { name: "index.js", mount: true, dir: "api", content: "const { Router } = require('squirrel_resource')\n\nmodule.exports = Router()" },
-    { name: "make.js", mount: true, dir: "root", content: "const { Make } = require('../module/index')\n\nMake.build()" },
+    { name: "make", mount: true, dir: "root", content: "const { Make } = require('squirrel_resource')\n\nMake.build()" },
     { module: 'controller', name: "[NAME]Controller.js", mount: false, dir: "controller", content: {
         original: "const { BaseController } = require('squirrel_resource')\n\nmodule.exports = class [NAME]Controller extends BaseController {\n  constructor(request, response) { super(request, response) }\n\n\n\n}",
         extended: "const [NAME]Service = require('../service/[NAME]Service.js')\n\nmodule.exports = class [NAME]Controller extends [NAME]Service {\n  constructor(request, response) { super(request, response) }\n\n\n\n}"
