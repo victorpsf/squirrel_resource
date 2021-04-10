@@ -115,8 +115,8 @@ const RouterApi = function () {
       else throw new Error('squirrel_resource Router: bad paramiter')
     },
 
-    use(url, fn) {
-      this._router_.use(url, fn)
+    use(...args) {
+      this._router_.use(...args)
       return this
     },
 

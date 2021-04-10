@@ -18,7 +18,7 @@ declare interface RouterApi {
   _addRouter(httpMethod: httpMethod, url: string, controller: string, method: string): void
   _addRouter(httpMethod: httpMethod, url: string, controller: (req: Request, res: Response) => void): void
   use(args: any[]): RouterApi
-  responseHeader(headers?: object): RouterApi
+  responseHeaders(headers?: object): RouterApi
   static(url: string, args: { dir?: TypeDirectory | string, path: string }): RouterApi
   prefix(prefix: string, callback: (routerApi: RouterApi) => RouterApi): RouterApi
   get(url: string, controller: string, method: string): RouterApi
