@@ -115,8 +115,8 @@ const RouterApi = function () {
       else throw new Error('squirrel_resource Router: bad paramiter')
     },
 
-    use(...args) {
-      this._router_.use.apply(null, args)
+    use(url, fn) {
+      this._router_.use(url, fn)
       return this
     },
 
@@ -138,7 +138,7 @@ const RouterApi = function () {
       _path = ''
 
       if (this._util_.isString(dir)) {
-        if (this._util_.in_array(this._storage_._publicDirectorys, dir)) throw new Error(`squirrel_resource Router: dir ${dir} is not public directory`)
+        if (!this._util_.in_array(this._storage_._publicDirectorys, dir)) throw new Error(`squirrel_resource Router: dir ${dir} is not public directory`)
         _path = this._storage_.get(dir)
       }
 

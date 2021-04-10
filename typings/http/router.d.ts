@@ -1,5 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express'
 import { Util } from 'squirrel_orm'
+import TypeDirectory from '../types/repository'
 import Storage from '../util/Storage'
 import httpMethod from '../types/http_method'
 import BaseController from '../http/controller/base_controller'
@@ -18,7 +19,7 @@ declare interface RouterApi {
   _addRouter(httpMethod: httpMethod, url: string, controller: (req: Request, res: Response) => void): void
   use(args: any[]): RouterApi
   responseHeader(headers?: object): RouterApi
-  static(url: string, args: { dir?: string, path: string }): RouterApi
+  static(url: string, args: { dir?: TypeDirectory | string, path: string }): RouterApi
   prefix(prefix: string, callback: (routerApi: RouterApi) => RouterApi): RouterApi
   get(url: string, controller: string, method: string): RouterApi
   get(url: string, controller: (req: Request, res: Response) => void): RouterApi
