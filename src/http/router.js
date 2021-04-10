@@ -146,7 +146,7 @@ const RouterApi = function () {
         _path = (_path) ? this._storage_.join_path(_path, path) : path
       }
 
-      if (_path) throw new Error('squirrel_resource Router: static function require object in second argument')
+      if (!_path) throw new Error('squirrel_resource Router: static function require object in second argument')
 
       this.use(_url_, static(_path))
       return this
