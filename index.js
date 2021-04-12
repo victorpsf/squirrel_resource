@@ -4,5 +4,6 @@ module.exports = {
   Storage: require('./src/util/Storage'),
   BaseController: require('./src/http/controller/BaseController'),
   Make: require('./src/util/Make'),
-  Config: require('./src/config')
+  Config: require('./src/config'),
+  Validator: require('./src/util/Validator')
 }
