@@ -6,7 +6,7 @@ import Validator from '../../util/Validator'
 declare namespace BaseController {}
 
 declare class BaseController {
-  Validator: Validator
+  Validator: typeof Validator
   request: Request
   response: Response
 
