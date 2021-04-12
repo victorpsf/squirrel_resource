@@ -1,7 +1,7 @@
 const { request, response } = require('express')
 
 module.exports = class BaseController {
-  validator = require('../../util/Validator')
+  Validator = require('../../util/Validator')
 
   constructor(req = request, res = response) {
     this.request  = req;
