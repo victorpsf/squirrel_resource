@@ -1,6 +1,6 @@
 {
   "name": "squirrel_resource",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "biblioteca para servidores nodejs",
   "main": "index.js",
   "scripts": {
