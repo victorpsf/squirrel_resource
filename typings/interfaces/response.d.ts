@@ -1,3 +1,3 @@
-import { Response } from 'express'
+declare interface CustomResponse {}
 
-export interface CustomResponse extends Response {}
+export = CustomResponse
