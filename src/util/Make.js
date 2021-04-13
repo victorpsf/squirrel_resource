@@ -94,9 +94,9 @@ module.exports = class Make extends Storage {
     return command
   }
 
-  search_directory(name) {
+  search_directory(_module, name) {
     for(let file of this._directorys.files) {
-      if (file.module && file.module == name) {
+      if (file.module && file.module == _module) {
         file.dir = this.get(file.dir)
         file.name = file.name.replace(/\[NAME\]/g, name)
         return file
@@ -112,8 +112,8 @@ module.exports = class Make extends Storage {
   writeService(value, controller) {
     if (typeof value !== 'string') 
       throw new Error('--service value is not defined. \n\nexample:\n  --service=[NAME]\n  --service=[NAME] --controller')
-    let name = this.getName(value);
-    let _service = this.search_directory('service')
+    let name = this.getName(value),
+        _service = this.search_directory('service', name)
 
     this.save_file({ 
       path: _service.dir, 
@@ -129,7 +129,7 @@ module.exports = class Make extends Storage {
     if (typeof value !== 'string') 
       throw new Error('--controller value is not defined. \n\nexample:\n  --controller=[NAME]\n  --controller=[NAME] --service')
     let name = this.getName(value), 
-        directory = this.search_directory('controller')
+        directory = this.search_directory('controller', name)
 
     if (service) this.writeService(value)
     this.save_file({ 
@@ -144,7 +144,7 @@ module.exports = class Make extends Storage {
     if (typeof value !== 'string') 
       throw new Error('--router value is not defined. \n\nexample:\n  --router=[NAME]\n  --router=[NAME] --controller --service')
     let name = this.getName(value), 
-        directory = this.search_directory('router')
+        directory = this.search_directory('router', name)
     if (controller) this.writeController(value, service)
 
     this.save_file({ 
@@ -161,7 +161,7 @@ module.exports = class Make extends Storage {
     if (typeof value !== 'string') 
       throw new Error('--model value is not defined. \n\nexample:\n  --model=[NAME]')
     let name = this.getName(value), 
-        directory = this.search_directory('model')
+        directory = this.search_directory('model', name)
 
     this.save_file({ 
       path: directory.dir, 
@@ -175,7 +175,7 @@ module.exports = class Make extends Storage {
     if (typeof value !== 'string') 
       throw new Error('--middleware value is not defined. \n\nexample:\n  --middleware=[NAME]')
     let name = this.getName(value), 
-        directory = this.search_directory('middleware')
+        directory = this.search_directory('middleware', name)
 
     this.save_file({ 
       path: directory.dir, 

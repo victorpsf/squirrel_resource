@@ -36,7 +36,7 @@ module.exports = class Middleware {
   }
 
   _setInternalFunctions(request, response, next) {
-    request._cache = () => {
+    request.cache = () => {
       return this.cache
     }
     request.secret = () => {

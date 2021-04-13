@@ -7,7 +7,7 @@ module.exports = class BaseController {
   constructor(request, response) {
     this.request  = request;
     this.response = response;
-    this.Cache = req.cache()
+    this.Cache = request.cache()
   }
 
   currentTime() {
