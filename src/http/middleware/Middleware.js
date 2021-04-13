@@ -1,7 +1,6 @@
 module.exports = class Middleware {
   _express = require('express')
   _app     = this._express()
-  _config  = require('../../config')
   _util    = require('./MiddlewareUtil')
   _internal = { 
     count: 0,
@@ -14,7 +13,13 @@ module.exports = class Middleware {
   }
 
   constructor() {
+    const Config = require('../../config')
+    this._config = Config.server()
+    const Cache = require('../../cache')
+    this.cache = new Cache(this._config.cache)
+
     this._app.use((...args) => this._newRequest(...args))
+    this._app.use((...args) => this._setCacheInRequest(...args))
   }
 
   router(router) {
@@ -28,6 +33,13 @@ module.exports = class Middleware {
 
   openToRequest() {
     return (this._internal.count < this._internal.listen.max_request)
+  }
+
+  _setCacheInRequest(request, response, next) {
+    request._cache = () => {
+      return this.cache
+    }
+    next()
   }
 
   _newRequest(request, response, next) {
@@ -52,12 +64,11 @@ module.exports = class Middleware {
   }
 
   listen(callback) {
-    let config = this._config.server()
-    let protocol = this._util.get_protocol(config.server.protocol, this._app, config.ssl)
-    this._internal.listen = config.middleware
+    let protocol = this._util.get_protocol(this._config.server.protocol, this._app, this._config.ssl)
+    this._internal.listen = this._config.middleware
     this._listenInterval()
 
-    protocol.listen(config.server, () => callback.apply(null, [config.server]))
+    protocol.listen(this._config.server, () => callback.apply(null, [this._config.server]))
     return protocol
   }
 

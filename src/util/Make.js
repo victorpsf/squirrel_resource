@@ -1,4 +1,5 @@
 const Storage = require('./Storage')
+const Crypto = require('../crypto')
 
 module.exports = class Make extends Storage {
   constructor() { super() }
@@ -13,17 +14,43 @@ module.exports = class Make extends Storage {
     return { command: command.trim().toLowerCase(), name: (name) ? name.trim().toLowerCase(): name }
   }
 
+  getEnvMap(shared, secret, passphrase) {
+    return function (value, index, array) {
+      let [env] = value.split('=')
+
+      if (/SERVER_SECRET\=/g.test(value) && secret)
+        return value = `${env}=${shared}`
+      else if (/SERVER_PASSPHRASE\=/g.test(value) && passphrase)
+        return value = `${env}=${shared}`
+      else return value
+    }
+  }
+
+  getFiles(path, fileNames = [], count = 0) {
+    try {
+      return this.read_file({ path, filename: fileNames[count], encoding: 'utf-8' })
+    } catch (error) {
+      if (fileNames[count + 1])
+        return this.getFiles(path, fileNames, count++)
+      else throw error
+    }
+  }
+
   filterCommandArray(value, index, array) {
     let [command, name] = value
     let bool = false
 
     if (!command) return bool
+    command = command.trim().toLowerCase()
     if (
-      /\-\-[service]/.test(command.trim().toLowerCase()) || 
-      /\-\-[model]/.test(command.trim().toLowerCase()) ||
-      /\-\-[controller]/.test(command.trim().toLowerCase()) ||
-      /\-\-[router]/.test(command.trim().toLowerCase()) || 
-      /\-\-[middleware]/.test(command.trim().toLowerCase())
+      /\-\-[service]/.test(command) || 
+      /\-\-[model]/.test(command) ||
+      /\-\-[controller]/.test(command) ||
+      /\-\-[router]/.test(command) || 
+      /\-\-[middleware]/.test(command) ||
+      /\-\-[env]\-[secret]/.test(command) ||
+      /\-\-[env]\-[passphrase]/.test(command) || 
+      /\-\-[hash]/.test(command)
     ) bool = true
 
     return bool
@@ -54,7 +81,11 @@ module.exports = class Make extends Storage {
 
   search_directory(name) {
     for(let file of this._directorys.files) {
-      if (file.module && file.module == name) return file
+      if (file.module && file.module == name) {
+        file.dir = this.get(file.dir)
+        file.name = file.name.replace(/\[NAME\]/g, name)
+        return file
+      }
     }
   }
 
@@ -64,66 +95,97 @@ module.exports = class Make extends Storage {
   }
 
   writeService(value, controller) {
-    if (typeof value !== 'string') throw new Error('--service value is not defined. \n\nexample:\n  --service=[NAME]\n  --service=[NAME] --controller')
+    if (typeof value !== 'string') 
+      throw new Error('--service value is not defined. \n\nexample:\n  --service=[NAME]\n  --service=[NAME] --controller')
     let name = this.getName(value);
     let _service = this.search_directory('service')
-    
-    _service.dir = this.get(_service.dir)
-    _service.name  = _service.name.replace(/\[NAME\]/g, name)
-    _service.content   = _service.content.replace(/\[NAME\]/g, name)
 
-    this.save_file({ path: _service.dir, filename: _service.name, value: _service.content, encoding: 'utf-8' })
+    this.save_file({ 
+      path: _service.dir, 
+      filename: _service.name, 
+      value: _service.content.replace(/\[NAME\]/g, name), 
+      encoding: 'utf-8' 
+    })
+
     if (controller) this.writeController(value)
   }
 
   writeController(value, service) {
-    if (typeof value !== 'string') throw new Error('--controller value is not defined. \n\nexample:\n  --controller=[NAME]\n  --controller=[NAME] --service')
-    let name = this.getName(value), directory = this.search_directory('controller')
+    if (typeof value !== 'string') 
+      throw new Error('--controller value is not defined. \n\nexample:\n  --controller=[NAME]\n  --controller=[NAME] --service')
+    let name = this.getName(value), 
+        directory = this.search_directory('controller')
 
     if (service) this.writeService(value)
-    directory.dir = this.get(directory.dir)
-    directory.name = directory.name.replace(/\[NAME\]/g, name)
-    directory.content = ((service)? directory.content.extended: directory.content.original).replace(/\[NAME\]/g, name)
-
-    this.save_file({ path: directory.dir, filename: directory.name, value: directory.content, encoding: 'utf-8' })
+    this.save_file({ 
+      path: directory.dir, 
+      filename: directory.name, 
+      value: ((service)? directory.content.extended: directory.content.original).replace(/\[NAME\]/g, name), 
+      encoding: 'utf-8' 
+    })
   }
 
   writeRouter(value, controller, service) {
-    if (typeof value !== 'string') throw new Error('--router value is not defined. \n\nexample:\n  --router=[NAME]\n  --router=[NAME] --controller --service')
-    let name = this.getName(value), directory = this.search_directory('router')
-
+    if (typeof value !== 'string') 
+      throw new Error('--router value is not defined. \n\nexample:\n  --router=[NAME]\n  --router=[NAME] --controller --service')
+    let name = this.getName(value), 
+        directory = this.search_directory('router')
     if (controller) this.writeController(value, service)
-    directory.dir = this.get(directory.dir)
-    directory.name = directory.name.replace(/\[NAME\]/g, name) 
-    directory.content = (controller || service) ? directory.content.original : directory.content.extended
 
-    directory.content = directory.content
-      .replace(/\[NAMECONTROLLER\]/g, controller ? `// Controller created: ${name}Controller.js`: '')
-      .replace(/\[NAMESERVICE\]/g, service ? `// Service created: ${name}Service.js`: '')
-
-    this.save_file({ path: directory.dir, filename: directory.name, value: directory.content, encoding: 'utf-8' })
+    this.save_file({ 
+      path: directory.dir, 
+      filename: directory.name, 
+      value: ((controller || service) ? directory.content.original : directory.content.extended)
+        .replace(/\[NAMECONTROLLER\]/g, controller ? `// Controller created: ${name}Controller.js`: '')
+        .replace(/\[NAMESERVICE\]/g, service ? `// Service created: ${name}Service.js`: ''), 
+      encoding: 'utf-8' 
+    })
   }
 
   writeModel(value) {
-    if (typeof value !== 'string') throw new Error('--model value is not defined. \n\nexample:\n  --model=[NAME]')
-    let name = this.getName(value), directory = this.search_directory('model')
+    if (typeof value !== 'string') 
+      throw new Error('--model value is not defined. \n\nexample:\n  --model=[NAME]')
+    let name = this.getName(value), 
+        directory = this.search_directory('model')
 
-    directory.dir = this.get(directory.dir)
-    directory.name = directory.name.replace(/\[NAME\]/g, name)
-    directory.content = directory.content.replace(/\[NAME\]/g, name)
-
-    this.save_file({ path: directory.dir, filename: directory.name, value: directory.content, encoding: 'utf-8' })
+    this.save_file({ 
+      path: directory.dir, 
+      filename: directory.name, 
+      value: directory.content.replace(/\[NAME\]/g, name), 
+      encoding: 'utf-8' 
+    })
   }
 
   writeMiddleware(value) {
-    if (typeof value !== 'string') throw new Error('--middleware value is not defined. \n\nexample:\n  --middleware=[NAME]')
-    let name = this.getName(value), directory = this.search_directory('middleware')
+    if (typeof value !== 'string') 
+      throw new Error('--middleware value is not defined. \n\nexample:\n  --middleware=[NAME]')
+    let name = this.getName(value), 
+        directory = this.search_directory('middleware')
 
-    directory.dir = this.get(directory.dir)
-    directory.name = directory.name.replace(/\[NAME\]/g, name)
-    directory.content = directory.content.replace(/\[NAME\]/g, name)
+    this.save_file({ 
+      path: directory.dir, 
+      filename: directory.name, 
+      value: directory.content.replace(/\[NAME\]/g, name), 
+      encoding: 'utf-8' 
+    })
+  }
 
-    this.save_file({ path: directory.dir, filename: directory.name, value: directory.content, encoding: 'utf-8' })
+  writeSecretOrPassphrase(value, hash, secret, passphrase) {
+    if (typeof value !== 'string') 
+      throw new Error('--set value is not defined. \n\nexample:\n  --set=[VALUE]')
+
+    let storage = new Storage(),
+        rootPath = storage.get('root'),
+        content = this.getFiles(rootPath, ['.env', '.env-example'])
+
+    if (!content) throw new Error('Make: .env and .env-example is not defined')
+    if (hash) value = Crypto.Hash().update(value)
+
+    storage.save_file({ 
+      path: rootPath, 
+      filename: '.env', 
+      value: content.split(/\n/).map(this.getEnvMap(value, secret, passphrase)).join('\n')
+    });
   }
 
   execute_command() {
@@ -147,6 +209,9 @@ module.exports = class Make extends Storage {
           break;
         case '--middleware':
           this.writeMiddleware(data.name)
+          break;
+        case '--set':
+          this.writeSecretOrPassphrase(data.name, this.search_command('--hash'), this.search_command('--env-secret'), this.search_command('--env-passphrase'))
           break;
         default:
           console.log(`Unsupported command: '${data.command}'`)

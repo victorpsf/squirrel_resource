@@ -5,5 +5,6 @@ module.exports = {
   BaseController: require('./src/http/controller/BaseController'),
   Make: require('./src/util/Make'),
   Config: require('./src/config'),
-  Validator: require('./src/util/Validator')
+  Validator: require('./src/util/Validator'),
+  Crypto: require('./src/crypto/index')
 }

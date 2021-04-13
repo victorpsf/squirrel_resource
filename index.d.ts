@@ -5,6 +5,7 @@ import SquirrelResourceBaseController from './typings/http/controller/base_contr
 import SquirrelResourceMake from './typings/util/Make'
 import SquirrelResourceConfig from './typings/config'
 import SquirrelResourceValidator from './typings/util/Validator'
+import SquirrelResourceCrypto from './typings/crypto/index'
 
 export = {
   Storage: SquirrelResourceStorage,
@@ -13,5 +14,6 @@ export = {
   Middleware: SquirrelResourceMiddleware,
   Make: SquirrelResourceMake,
   Config: SquirrelResourceConfig,
-  Validator: SquirrelResourceValidator
+  Validator: SquirrelResourceValidator,
+  Crypto: SquirrelResourceCrypto
 }

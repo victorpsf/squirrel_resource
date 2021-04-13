@@ -97,11 +97,15 @@ module.exports = class Config extends Storage {
       { env: "MAX_REQUEST_SECONDS", key: "max_request", type: "number", default: 20 },
       { env: "REQUEST_RESET_SECONDS", key: "request_second", type: "number", default: 60 }
     ]
+    let cacheConfig = [
+      { env: "SERVER_CACHE_CLEAR_SECOND", key: "cache_clear_time", type: "number", default: 3600 }
+    ]
 
     let config = {
       server: this._custom_get_env_keys("server_ssl", serverConfig),
       ssl: this._custom_get_env_keys("server_ssl", serverSSL),
-      middleware: this._custom_get_env_keys("server_ssl", middlewareConfig)
+      middleware: this._custom_get_env_keys("server_ssl", middlewareConfig),
+      cache: this._custom_get_env_keys(cacheConfig)
     }
 
     if (!Object.keys(config.ssl).length) delete config.ssl
