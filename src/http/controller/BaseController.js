@@ -1,11 +1,13 @@
-const { request, response } = require('express')
+const Crypto = require('../../crypto/index')
 
 module.exports = class BaseController {
   Validator = require('../../util/Validator')
+  Crypto = Crypto
 
-  constructor(req = request, res = response) {
-    this.request  = req;
-    this.response = res;
+  constructor(request, response) {
+    this.request  = request;
+    this.response = response;
+    this.Cache = req.cache()
   }
 
   currentTime() {

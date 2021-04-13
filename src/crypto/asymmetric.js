@@ -5,12 +5,12 @@ module.exports = class Asymmetric {
 
   rsa = {
     modulusLength: 1024,
-    publicExponent = 0x10001,
-    publicKeyEncoding = {
+    publicExponent: 0x10001,
+    publicKeyEncoding: {
       type: 'pkcs1',
       format: 'pem'
     },
-    privateKeyEncoding = {
+    privateKeyEncoding: {
       type: 'pkcs8',
       format: 'pem',
       cipher: 'aes-256-cbc'

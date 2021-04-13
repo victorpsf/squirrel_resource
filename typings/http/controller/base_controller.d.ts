@@ -1,16 +1,21 @@
-import { Request, Response } from 'express'
+import request from '../../interfaces/request'
+import response from '../../interfaces/response'
 import DefaultReponseJSON from '../../interfaces/default_response_json'
 import DefaultReponseJSONResult from '../../interfaces/default_response_json_result'
 import Validator from '../../util/Validator'
+import Crypto from '../../crypto/index'
+import Cache from '../../cache'
 
 declare namespace BaseController {}
 
 declare class BaseController {
   Validator: typeof Validator
-  request: Request
-  response: Response
+  request: request
+  response: response
+  Crypto: typeof Crypto
+  Cache: Cache
 
-  constructor(request: Request, response: Response)
+  constructor(request: request, response: response)
 
   currentTime(): number
   status(code: number): void
@@ -21,7 +26,7 @@ declare class BaseController {
   all(): object
 
   defaultResponseJSON(args: DefaultReponseJSON): DefaultReponseJSONResult
-  static instance(request: Request, response: Response): BaseController
+  static instance(request: request, response: response): BaseController
 }
 
 export = BaseController

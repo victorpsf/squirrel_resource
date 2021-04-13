@@ -19,7 +19,7 @@ module.exports = class Middleware {
     this.cache = new Cache(this._config.cache)
 
     this._app.use((...args) => this._newRequest(...args))
-    this._app.use((...args) => this._setCacheInRequest(...args))
+    this._app.use((...args) => this._setInternalFunctions(...args))
   }
 
   router(router) {
@@ -35,9 +35,18 @@ module.exports = class Middleware {
     return (this._internal.count < this._internal.listen.max_request)
   }
 
-  _setCacheInRequest(request, response, next) {
+  _setInternalFunctions(request, response, next) {
     request._cache = () => {
       return this.cache
+    }
+    request.secret = () => {
+      return this._config.env.server_secret
+    }
+    request.passphrase = () => {
+      return this._config.env.server_passphrase
+    }
+    request.iv = () => {
+      return this._config.env.server_iv
     }
     next()
   }

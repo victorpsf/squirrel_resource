@@ -6,8 +6,9 @@ module.exports = class Cache extends Util {
   check = {}
   cache = {}
 
-  constructor({ cache_clear_time = 3600 }) {
+  constructor(args = {}) {
     super()
+    let { cache_clear_time = 3600 } = args || {}
     this.time = cache_clear_time;
     this.listen()
   }

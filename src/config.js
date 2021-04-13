@@ -8,7 +8,7 @@ module.exports = class Config extends Storage {
     this._dotenv.config()
   }
 
-  _custom_get_env_keys(type, keys = [{ env: undefined, key: undefined, type: undefined, file_system: undefined, default: undefined }]) {
+  _custom_get_env_keys(keys = [{ env: undefined, key: undefined, type: undefined, file_system: undefined, default: undefined }], type) {
     let config = {}
     for(let arg of keys) {
       let value = this._process.env[arg.env] || null
@@ -70,8 +70,8 @@ module.exports = class Config extends Storage {
       { env: "MYSQL_CIPHERS", key: "chipers", type: "string", file_system: false, default: null}
     ]
 
-    let config = this._custom_get_env_keys('mysql_ssl', keysConfig)
-    let ssl = this._custom_get_env_keys('mysql_ssl', keysSslConfig)
+    let config = this._custom_get_env_keys(keysConfig, 'mysql_ssl')
+    let ssl = this._custom_get_env_keys(keysSslConfig, 'mysql_ssl')
 
     return (ssl instanceof Object && Object.keys(ssl).length) ? { ...config, ssl } : config;
   }
@@ -100,12 +100,18 @@ module.exports = class Config extends Storage {
     let cacheConfig = [
       { env: "SERVER_CACHE_CLEAR_SECOND", key: "cache_clear_time", type: "number", default: 3600 }
     ]
+    let env = [
+      { env: "SERVER_SECRET", key: "server_secret", type: "string", default: null },
+      { env: "SERVER_PASSPHRASE", key: "server_passphrase", type: "string", default: null },
+      { env: "SERVER_IV", key: "server_iv", type: "string", default: null }
+    ]
 
     let config = {
-      server: this._custom_get_env_keys("server_ssl", serverConfig),
-      ssl: this._custom_get_env_keys("server_ssl", serverSSL),
-      middleware: this._custom_get_env_keys("server_ssl", middlewareConfig),
-      cache: this._custom_get_env_keys(cacheConfig)
+      server: this._custom_get_env_keys(serverConfig, 'server_ssl'),
+      ssl: this._custom_get_env_keys(serverSSL, 'server_ssl'),
+      middleware: this._custom_get_env_keys(middlewareConfig, 'server_ssl'),
+      cache: this._custom_get_env_keys(cacheConfig),
+      env: this._custom_get_env_keys(env)
     }
 
     if (!Object.keys(config.ssl).length) delete config.ssl

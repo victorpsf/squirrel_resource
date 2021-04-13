@@ -14,7 +14,7 @@ module.exports = class Make extends Storage {
     return { command: command.trim().toLowerCase(), name: (name) ? name.trim().toLowerCase(): name }
   }
 
-  getEnvMap(shared, secret, passphrase) {
+  getEnvMap(shared, secret, passphrase, iv) {
     return function (value, index, array) {
       let [env] = value.split('=')
 
@@ -22,8 +22,22 @@ module.exports = class Make extends Storage {
         return value = `${env}=${shared}`
       else if (/SERVER_PASSPHRASE\=/g.test(value) && passphrase)
         return value = `${env}=${shared}`
+      else if (/SERVER_IV\=/g.test(value) && iv) {
+        const crypto = require('crypto')
+        return value = `${env}=${crypto.randomBytes(16).toString('hex').toUpperCase()}`
+      }
       else return value
     }
+  }
+
+  mapIv(line, index, array) {
+    let [env] = line.split('=')
+    if (/SERVER_IV\=/g.test(line)) {
+      const crypto = require('crypto')
+      let iv = crypto.randomBytes(16).toString('hex').toUpperCase()
+      return line = `${env}=${iv}`
+    }
+    return line
   }
 
   getFiles(path, fileNames = [], count = 0) {
@@ -31,7 +45,7 @@ module.exports = class Make extends Storage {
       return this.read_file({ path, filename: fileNames[count], encoding: 'utf-8' })
     } catch (error) {
       if (fileNames[count + 1])
-        return this.getFiles(path, fileNames, count++)
+        return this.getFiles(path, fileNames, count + 1)
       else throw error
     }
   }
@@ -50,7 +64,8 @@ module.exports = class Make extends Storage {
       /\-\-[middleware]/.test(command) ||
       /\-\-[env]\-[secret]/.test(command) ||
       /\-\-[env]\-[passphrase]/.test(command) || 
-      /\-\-[hash]/.test(command)
+      /\-\-[hash]/.test(command) ||
+      /\-\-[iv]/.test(command)
     ) bool = true
 
     return bool
@@ -170,21 +185,31 @@ module.exports = class Make extends Storage {
     })
   }
 
-  writeSecretOrPassphrase(value, hash, secret, passphrase) {
+  writeSecretOrPassphraseOrIv(value, hash, secret, passphrase, iv) {
     if (typeof value !== 'string') 
       throw new Error('--set value is not defined. \n\nexample:\n  --set=[VALUE]')
 
-    let storage = new Storage(),
-        rootPath = storage.get('root'),
+    let rootPath = this.get('root'),
         content = this.getFiles(rootPath, ['.env', '.env-example'])
 
     if (!content) throw new Error('Make: .env and .env-example is not defined')
     if (hash) value = Crypto.Hash().update(value)
 
-    storage.save_file({ 
+    this.save_file({ 
       path: rootPath, 
       filename: '.env', 
-      value: content.split(/\n/).map(this.getEnvMap(value, secret, passphrase)).join('\n')
+      value: content.split(/\n/).map(this.getEnvMap(value, secret, passphrase, iv)).join('\n')
+    });
+  }
+
+  writeIv() {
+    let rootPath = this.get('root'),
+        content = this.getFiles(rootPath, ['.env', '.env-example'])
+
+    this.save_file({ 
+      path: rootPath, 
+      filename: '.env', 
+      value: content.split(/\n/).map(this.mapIv).join('\n')
     });
   }
 
@@ -211,10 +236,38 @@ module.exports = class Make extends Storage {
           this.writeMiddleware(data.name)
           break;
         case '--set':
-          this.writeSecretOrPassphrase(data.name, this.search_command('--hash'), this.search_command('--env-secret'), this.search_command('--env-passphrase'))
+          this.writeSecretOrPassphraseOrIv(data.name, this.search_command('--hash'), this.search_command('--env-secret'), this.search_command('--env-passphrase'), this.search_command('--iv'))
+          break;
+        case '--iv':
+          this.writeIv()
+          break;
+        case '--help':
+          console.log(`list commands in make
+--set=[VALUE]                         set new value in .env
+  --env-secret                        set 'SERVER_SECRET' in .env
+  --env-passphrase                    set 'SERVER_PASSPHRASE' in .env
+  --iv                                set 'SERVER_IV' random byte hexadecimal in .env
+  --hash                              using hash 'sha512' in set value
+
+--iv                                  set 'SERVER_IV' random byte hexadecimal in .env
+
+--middleware=[NAME]                   set new middleware in http/middleware
+
+--model=[NAME]                        set new model in app/
+
+--router=[NAME]                       set new router in api/
+  --controller                        set new controller using router name
+  --service                           set new service using router name
+
+--service=[NAME]                      set new service in http/service
+  --controller                        set new controller using service name
+
+--controller=[NAME]                   set new controller in http/controller
+  --service                           set new service using controller name
+`)
           break;
         default:
-          console.log(`Unsupported command: '${data.command}'`)
+          console.log(`Unsupported command: '${data.command}'\n\nUsing 'node make --help'`)
           break;
       }
     }
