@@ -117,7 +117,7 @@ module.exports = class Storage extends Path {
     switch (parser) {
       case 'json':
       case 'array':
-        return (encodingType == 'write') ? JSON.stringify(vaue) : JSON.parse(value)
+        return (encodingType == 'write') ? JSON.stringify(value) : JSON.parse(value)
       default:
         return value
     }
