@@ -27,7 +27,7 @@ module.exports = class Validator extends Util {
   }
 
   getMessage(field, rule) {
-    let rulemessage;
+    let rulemessage = {};
     if (this.isObject(this.message) && this.isObject(this.message[field]))
       rulemessage = this.message[field];
     let message = '';
