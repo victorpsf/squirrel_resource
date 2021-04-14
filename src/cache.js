@@ -30,6 +30,7 @@ module.exports = class Cache extends Util {
   }
 
   get(key) {
+    this.check[key] = new Date()
     return this.cache[key] || {}
   }
 
