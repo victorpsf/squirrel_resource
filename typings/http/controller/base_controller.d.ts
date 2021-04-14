@@ -28,6 +28,7 @@ declare class BaseController {
   body(): object
   params(): object
   all(): object
+  sleep(time: number): Promise<boolean>
 
   defaultResponseJSON(args: DefaultReponseJSON): DefaultReponseJSONResult
   static instance(request: BaseController.request, response: BaseController.response): BaseController

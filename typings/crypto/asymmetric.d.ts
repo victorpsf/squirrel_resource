@@ -1,6 +1,7 @@
 import ciphers from '../types/asymmetric_cipher'
 import hashCiphers from '../types/hash_cipher'
 import Encoding from '../types/encoding_save'
+import RSA_padding from '../types/rsa_paddings'
 import { KeyPairSyncResult } from 'crypto'
 
 declare namespace Asymmetric {
@@ -14,6 +15,7 @@ declare namespace Asymmetric {
     hashAlgorithm?: hashCiphers
     // default 1024
     keyLength?: '8192' | '4096' | '2048' | '1024',
+    rsaPadding?: RSA_padding,
     publicKey?: string,
     privateKey?: string
   }
