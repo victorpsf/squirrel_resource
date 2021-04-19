@@ -6,6 +6,7 @@ import DefaultReponseJSONResult from '../../interfaces/default_response_json_res
 import Validator from '../../util/Validator'
 import Crypto from '../../crypto/index'
 import Cache from '../../cache'
+import Smtp from '../../smtp/smtp'
 
 declare namespace BaseController {
   interface request extends Request, CustomRequest {}
@@ -18,6 +19,7 @@ declare class BaseController {
   response: BaseController.response
   Crypto: typeof Crypto
   Cache: Cache
+  Smtp: Smtp
 
   constructor(request: BaseController.request, response: BaseController.response)
 

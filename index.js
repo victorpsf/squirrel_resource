@@ -6,5 +6,7 @@ module.exports = {
   Make: require('./src/util/Make'),
   Config: require('./src/config'),
   Validator: require('./src/util/Validator'),
-  Crypto: require('./src/crypto/index')
+  Crypto: require('./src/crypto/index'),
+  Mailer: require('./src/smtp/smtp'),
+  Utilities: require('./src/util/Utilities')
 }

@@ -6,6 +6,8 @@ import SquirrelResourceMake from './typings/util/Make'
 import SquirrelResourceConfig from './typings/config'
 import SquirrelResourceValidator from './typings/util/Validator'
 import SquirrelResourceCrypto from './typings/crypto/index'
+import SquirrelResourceSmtp from './typings/smtp/smtp'
+import SquirrelResourceUtilities from './typings/util/Utilities'
 
 export = {
   Storage: SquirrelResourceStorage,
@@ -15,5 +17,7 @@ export = {
   Make: SquirrelResourceMake,
   Config: SquirrelResourceConfig,
   Validator: SquirrelResourceValidator,
-  Crypto: SquirrelResourceCrypto
+  Crypto: SquirrelResourceCrypto,
+  Mailer: SquirrelResourceSmtp,
+  Utilities: SquirrelResourceUtilities
 }

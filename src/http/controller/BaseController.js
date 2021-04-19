@@ -1,8 +1,10 @@
 const Crypto = require('../../crypto/index')
+const Smtp = require('../../smtp/smtp')
 
 module.exports = class BaseController {
   Validator = require('../../util/Validator')
   Crypto = Crypto
+  Smtp = new Smtp()
 
   constructor(request, response) {
     this.request  = request;

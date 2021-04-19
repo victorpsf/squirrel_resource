@@ -12,6 +12,7 @@ module.exports = class Path {
     service: '/service',
     private: '/private',
     public: '/public',
+    mail: '/mail',
     model: '/app',
     pages: '/pages',
     api: '/api',
@@ -21,9 +22,7 @@ module.exports = class Path {
   }
   _args = []
 
-  constructor() {
-    this.set()
-  }
+  constructor() { this.set() }
 
   /**
    * @param {*} path 
@@ -118,6 +117,7 @@ module.exports = class Path {
         return this.join_path(this.get('model'), this._paths[path])
       case 'server_ssl':
       case 'mysql_ssl':
+      case 'mail':
         return this.join_path(this.get('private'), this._paths[path])
       case 'root':
       default:

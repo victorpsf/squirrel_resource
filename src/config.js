@@ -117,4 +117,33 @@ module.exports = class Config extends Storage {
     if (!Object.keys(config.ssl).length) delete config.ssl
     return config
   }
+
+  static mail() {
+    let config = new this()
+    return config.mail()
+  }
+
+  mail() {
+    let mailConfig = [
+      { env: "SMTP_HOST", key: "host", type: "string", default: null },
+      { env: "SMTP_PORT", key: "port", type: "number", default: null },
+      { env: "SMTP_SERVICE", key: "service", type: "string", default: null },
+    ]
+
+    let mailAuth = [
+      { env: "SMTP_USER", key: "user", type: "string", default: null },
+      { env: "SMTP_PASS", key: "pass", type: "string", default: null }
+    ]
+
+    mailConfig = this._custom_get_env_keys(mailConfig)
+    mailAuth   = this._custom_get_env_keys(mailAuth)
+
+    let config = {
+      ...mailConfig,
+      auth: mailAuth
+    }
+
+    if (!Object.keys(mailAuth).length) delete config.auth
+    return config;
+  }
 }
