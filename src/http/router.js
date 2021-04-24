@@ -24,10 +24,14 @@ const RouterApi = function () {
 
     _usePrefix() {
       if (this._util_.isNullOrUndefined(this._prefix_)) return
-      let { url, callback } = this._prefix_
 
-      let router = callback(RouterApi())
-      if (router && this._util_.isFunction(router.build)) this._router_.use(url, router.build())
+      for(let url in this._prefix_) {
+        let callback = this._prefix_[url]
+
+        let router = callback(RouterApi())
+        if (router && this._util_.isFunction(router.build)) 
+          this._router_.use(url, router.build())
+      }
     },
 
     _getController(httpMethod, controller) {
@@ -155,10 +159,10 @@ const RouterApi = function () {
     prefix(prefix, callback) {
       if (!this._util_.isFunction(callback)) throw new Error('squirrel_resource Router: second argument is not function, please inform callback')
 
-      this._prefix_ = {
-        url: this._parseUrl(prefix),
-        callback
-      }
+      if (this._util_.isNullOrUndefined(this._prefix_))
+        this._prefix_ = {}
+      
+      this._prefix_[this._parseUrl(prefix)] = callback
       return this
     },
 
